@@ -1,0 +1,95 @@
+---
+- name: Set correct permissions for Traefik certificate files
+  file:
+    path: "{{ item }}"
+    mode: '0600'
+  loop:
+    - "{{ repo_dest }}/data/traefik/certs/acme_letsencrypt.json"
+    - "{{ repo_dest }}/data/traefik/certs/tls_letsencrypt.json"
+
+- name: Update all email addresses in Traefik configuration
+  replace:
+    path: "{{ repo_dest }}/data/traefik/traefik.yml"
+    regexp: '(\s*email:\s*)"[^"]*"'
+    replace: '\1"{{ email }}"'
+
+- name: Generate Secure Bouncer Key
+  ansible.builtin.command: openssl rand -base64 48
+  register: bouncer_key
+  changed_when: false
+
+- name: Display generated Bouncer key
+  debug:
+    msg: "Generated BOUNCER_KEY: {{ bouncer_key.stdout }}"
+
+- name: Store Bouncer Key in .env
+  ansible.builtin.lineinfile:
+    path: "{{ repo_dest }}/.env"
+    line: 'BOUNCER_KEY_TRAEFIK="{{ bouncer_key.stdout | regex_replace("[^a-zA-Z0-9!@#$%^&*()-_=+[\\]{}<>?\\|]", "") }}"'
+    create: yes
+    mode: '0600'
+
+- name: Start CrowdSec container
+  community.docker.docker_compose_v2:
+    project_src: "{{ repo_dest }}"
+    services:
+      - crowdsec
+    state: present
+
+- name: Stop CrowdSec container
+  community.docker.docker_compose_v2:
+    project_src: "{{ repo_dest }}"
+    services:
+      - crowdsec
+    state: absent
+
+- name: Overwrite acquis.yaml
+  ansible.builtin.copy:
+    dest: "{{ repo_dest }}/data/crowdsec/config/acquis.yaml"
+    content: |
+      filenames:
+       - /var/log/auth.log
+       - /var/log/syslog
+      labels:
+        type: syslog
+      ---
+      filenames:
+        - /var/log/traefik/access.log
+      labels:
+        type: traefik
+    mode: '0644'
+
+- name: Schedule CrowdSec restart
+  ansible.builtin.cron:
+    name: "Restart CrowdSec every 3 days"
+    minute: "0"
+    hour: "3"
+    day: "*/3"
+    job: "docker compose -f {{ repo_dest }}/docker-compose.yml restart crowdsec"
+    user: root
+
+- name: Ensure apache2-utils is installed (for htpasswd command)
+  become: yes
+  apt:
+    name: apache2-utils
+    state: present
+
+- name: Create .htpasswd file with dashboard user
+  become: yes
+  shell: |
+    htpasswd -bc "{{ repo_dest }}/data/traefik/.htpasswd" "{{ dashboard_user }}" "{{ dashboard_password }}"
+  args:
+    creates: "{{ repo_dest }}/data/traefik/.htpasswd"
+
+- name: Set proper permissions for .htpasswd file
+  become: yes
+  file:
+    path: "{{ repo_dest }}/data/traefik/.htpasswd"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Start all Containers
+  community.docker.docker_compose_v2:
+    project_src: "{{ repo_dest }}"
+    state: present

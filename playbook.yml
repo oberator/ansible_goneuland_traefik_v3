@@ -1,0 +1,14 @@
+---
+- name: Automated Server Provisioning
+  hosts: servers
+  become: yes
+
+  roles:
+    - role: common
+    - role: ssh
+    - role: firewall
+    - role: docker
+    - role: git
+    - role: crowdsec
+    - role: crowdsec_firewall_bouncer
+    - role: cleanup

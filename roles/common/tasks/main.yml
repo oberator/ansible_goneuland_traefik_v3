@@ -1,0 +1,25 @@
+---
+- name: Update and Upgrade APT Packages
+  apt:
+    update_cache: yes
+    upgrade: dist
+
+- name: Set timezone
+  timezone:
+    name: "{{ timezone }}"
+
+- name: Create Admin User with Root Privileges
+  user:
+    name: "{{ admin_user }}"
+    groups: sudo
+    append: yes
+    shell: /bin/bash
+    create_home: yes
+
+- name: Setup passwordless sudo
+  lineinfile:
+    path: /etc/sudoers
+    state: present
+    regexp: '^%sudo'
+    line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+    validate: '/usr/sbin/visudo -cf %s'
