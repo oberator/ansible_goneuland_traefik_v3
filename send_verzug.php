@@ -37,9 +37,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     try {
         $mail->isSMTP();
-        $mail->SMTPAuth = true; // Enable SMTP authentication
+        $mail->SMTPAuth = true;
         $mail->Host = $config['smtp_host'];
-        $mail->Username = $config['smtp_username']; // Ensure this is set in your config
+        $mail->Username = $config['smtp_username']; 
         $mail->Password = $config['smtp_password'];
         $mail->Port = $config['smtp_port'];
         $mail->SMTPSecure = $config['smtp_secure'];
@@ -75,7 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $xml->addChild('location', $location);
         $xml->addChild('planned_date', $planned_date);
         $xml->addChild('actual_date', $actual_date);
-        $xml->addChild('Grund', $delay_reason);
+        $xml->addChild('delay_reason', $delay_reason);
 
         // Save XML to a temporary file
         $tempXmlFile = tempnam(sys_get_temp_dir(), 'xml');
