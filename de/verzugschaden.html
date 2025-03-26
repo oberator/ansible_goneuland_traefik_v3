@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verzugsschaden melden</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen p-6">
+
+    <div class="bg-white shadow-lg rounded-lg p-6 text-center max-w-lg w-full">
+        <p class="text-red-600 font-bold text-lg mb-4">Nur durch die Disposition zu bef&uuml;llen!</p>
+
+        <h1 class="text-2xl font-bold mb-4">Verzugsschaden melden</h1>
+        <form id="verzugForm" enctype="multipart/form-data">
+
+            <label class="block text-left font-semibold mt-4">Auftragsnummer *</label>
+            <input type="text" id="auftragsnummer" name="order_number" class="w-full p-2 border border-gray-300 rounded-lg" required>
+
+            <label class="block text-left font-semibold mt-4">Datum *</label>
+            <input type="date" id="datum" name="date" class="w-full p-2 border border-gray-300 rounded-lg" required>
+
+            <label class="block text-left font-semibold mt-4">Ort *</label>
+            <input type="text" id="ort" name="location" class="w-full p-2 border border-gray-300 rounded-lg" required>
+
+            <label class="block text-left font-semibold mt-4">Soll-Termin *</label>
+            <input type="datetime-local" id="solltermin" name="planned_date" class="w-full p-2 border border-gray-300 rounded-lg" required>
+
+            <label class="block text-left font-semibold mt-4">Ist-Termin *</label>
+            <input type="datetime-local" id="isttermin" name="actual_date" class="w-full p-2 border border-gray-300 rounded-lg" required>
+
+            <label class="block text-left font-semibold mt-4">Foto Lieferschein (mind. 1 Datei) *</label>
+            <input type="file" id="lieferschein" name="delivery_note[]" accept="image/jpeg, image/png" multiple class="w-full p-2 border border-gray-300 rounded-lg" >
+
+            <label class="block text-left font-semibold mt-4">Grund f&uuml;r die Versp&auml;tung *</label>
+            <textarea id="grund" name="delay_reason" class="w-full p-2 border border-gray-300 rounded-lg" rows="3" required></textarea>
+
+            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg w-full mt-6">
+                Verzugsschaden melden
+            </button>
+            <p class="text-red-600 mt-4" id="statusMessage"></p>
+        </form>
+
+        <a href="../index.php" class="mt-6 inline-block bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition">
+            Zur&uuml;ck zur Hauptseite
+        </a>
+    </div>
+
+    <script>
+        document.getElementById('verzugForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const form = document.getElementById('verzugForm');
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('../send_verzug.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    document.getElementById('statusMessage').textContent = "✅ Verzugsschaden erfolgreich gemeldet!";
+                    document.getElementById('statusMessage').style.color = "green";
+                    form.reset();
+                } else {
+                    document.getElementById('statusMessage').textContent = "❌ Fehler: " + result.message;
+                    document.getElementById('statusMessage').style.color = "red";
+                }
+            } catch (error) {
+                document.getElementById('statusMessage').textContent = "❌ Fehler beim Senden der Anfrage.";
+                document.getElementById('statusMessage').style.color = "red";
+            }
+        });
+    </script>
+
+</body>
+</html>
