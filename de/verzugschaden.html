@@ -30,7 +30,7 @@
             <input type="datetime-local" id="isttermin" name="actual_date" class="w-full p-2 border border-gray-300 rounded-lg" required>
 
             <label class="block text-left font-semibold mt-4">Foto Lieferschein (mind. 1 Datei) *</label>
-            <input type="file" id="lieferschein" name="delivery_note[]" accept="image/jpeg, image/png" multiple class="w-full p-2 border border-gray-300 rounded-lg" >
+            <input type="file" id="lieferschein" name="attachments[]" accept="image/jpeg, image/png" multiple class="w-full p-2 border border-gray-300 rounded-lg" >
 
             <label class="block text-left font-semibold mt-4">Grund f&uuml;r die Versp&auml;tung *</label>
             <textarea id="grund" name="delay_reason" class="w-full p-2 border border-gray-300 rounded-lg" rows="3" required></textarea>
@@ -59,7 +59,12 @@
                     body: formData
                 });
 
-                const result = await response.json();
+                let result;
+                try {
+                    result = await response.json();
+                } catch (error) {
+                    throw new Error("Ungültige JSON-Antwort vom Server.");
+                }
 
                 if (result.status === 'success') {
                     document.getElementById('statusMessage').textContent = "✅ Verzugsschaden erfolgreich gemeldet!";
@@ -70,7 +75,7 @@
                     document.getElementById('statusMessage').style.color = "red";
                 }
             } catch (error) {
-                document.getElementById('statusMessage').textContent = "❌ Fehler beim Senden der Anfrage.";
+                document.getElementById('statusMessage').textContent = "❌ Fehler beim Senden der Anfrage: " + error.message;
                 document.getElementById('statusMessage').style.color = "red";
             }
         });

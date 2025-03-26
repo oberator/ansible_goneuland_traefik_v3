@@ -2,6 +2,8 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+$config = require '/etc/damagepage/smtp_config.php';
+
 require 'vendor/autoload.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -35,19 +37,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     try {
         $mail->isSMTP();
-        $mail->Host = '62.245.135.33';
-        $mail->SMTPAuth = true;
-        $mail->Username = 'fmrelay4you';
-        $mail->Password = 'mgrelay4fm!';
-        $mail->SMTPSecure = false;
-        $mail->SMTPAutoTLS = false;
-        $mail->Port = 25;
+        $mail->SMTPAuth = true; // Enable SMTP authentication
+        $mail->Host = $config['smtp_host'];
+        $mail->Username = $config['smtp_username']; // Ensure this is set in your config
+        $mail->Password = $config['smtp_password'];
+        $mail->Port = $config['smtp_port'];
+        $mail->SMTPSecure = $config['smtp_secure'];
+        $mail->SMTPAutoTLS = $config['smtp_autoTLS'];
 
         $mail->CharSet = 'UTF-8';
         $mail->Encoding = 'base64';
 
-        $mail->setFrom('test@oberrader.com', 'Schadensportal');
-        $mail->addAddress('test@oberrader.com', 'Schadensmanagement');
+        $mail->setFrom($config['email_from'], $config['email_from_title']);
+        $mail->addAddress($config['email_to'], $config['email_to_title']);
         $mail->Subject = "Verzugsschadenmeldung";
 
         $body = "Sehr geehrte Damen und Herren,\n\n";
@@ -82,16 +84,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Attach the XML file to the email
         $mail->addAttachment($tempXmlFile, 'Verzugsschadenmeldung.xml');
 
-        foreach ($_FILES['delivery_note']['tmp_name'] as $key => $tmp_name) {
-            if ($_FILES['delivery_note']['error'][$key] == 0) {
-                $mail->addAttachment($tmp_name, $_FILES['delivery_note']['name'][$key]);
+        if (isset($_FILES['attachments'])) {
+            foreach ($_FILES['attachments']['tmp_name'] as $key => $tmp_name) {
+                if ($_FILES['attachments']['error'][$key] == 0) {
+                    // Validate file type and size (example: max 7MB, allow PDFs and standard image formats)
+                    $allowedMimeTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+                    if ($_FILES['attachments']['size'][$key] <= 7 * 1024 * 1024 &&
+                        in_array(mime_content_type($tmp_name), $allowedMimeTypes)) {
+                        $mail->addAttachment($tmp_name, $_FILES['attachments']['name'][$key]);
+                    }
+                }
             }
         }
 
-        if ($mail->send()) {
-            echo json_encode(["status" => "success", "message" => "Verzugsschaden erfolgreich gemeldet!"]);
-        } else {
-            echo json_encode(["status" => "error", "message" => "Fehler beim Senden der E-Mail."]);
+        try {
+            if ($mail->send()) {
+                echo json_encode(["status" => "success", "message" => "Verzugsschaden erfolgreich gemeldet!"]);
+            } else {
+                echo json_encode(["status" => "error", "message" => "Fehler beim Senden der E-Mail: " . $mail->ErrorInfo]);
+            }
+        } catch (Exception $e) {
+            echo json_encode(["status" => "error", "message" => "Fehler beim Senden der E-Mail: " . $e->getMessage()]);
         }
 
         // Clean up the temporary file after sending the email
@@ -99,7 +112,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             unlink($tempXmlFile);
         }
     } catch (Exception $e) {
-        echo json_encode(["status" => "error", "message" => "? Fehler: {$mail->ErrorInfo}"]);
+        echo json_encode(["status" => "error", "message" => "Fehler: " . $e->getMessage()]);
     }
     
 }
