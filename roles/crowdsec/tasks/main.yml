@@ -1,4 +1,13 @@
 ---
+- name: Ensure Traefik certificate files exist or be created
+  file:
+    path: "{{ item }}"
+    state: touch
+    mode: '0600'
+  loop:
+    - "{{ repo_dest }}/data/traefik/certs/acme_letsencrypt.json"
+    - "{{ repo_dest }}/data/traefik/certs/tls_letsencrypt.json"
+
 - name: Set correct permissions for Traefik certificate files
   file:
     path: "{{ item }}"
@@ -11,6 +20,7 @@
   ansible.builtin.copy:
     src: "{{ repo_dest }}/data/traefik/traefik.yml.sample"
     dest: "{{ repo_dest }}/data/traefik/traefik.yml"
+    remote_src: yes
     mode: '0644'
 
 - name: Update all email addresses in Traefik configuration
