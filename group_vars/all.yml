@@ -4,7 +4,7 @@ timezone: "Europe/Berlin" # This is the timezone of your server
 ssh_port: 2022 # This is the port where the ssh server will listen
 ssh_public_key_path: "~/.ssh/yourpublickey.pub" # This is the local path to your public ssh key
 docker_directory: "/opt/containers" # This is the directory of your docker containers
-repo_url: "github.com/Psycho0verload/traefik-crowdsec-stack" # This is the URL of the git repository (normally no changes needed)
+repo_url: "https://github.com/Psycho0verload/traefik-crowdsec-stack" # This is the URL of the git repository (normally no changes needed)
 repo_dest: "{{ docker_directory }}/traefik-crowdsec-stack"  # This is the directory of you traefik stack
 traeffikdashboarddomain: "youdomain.com" #This is the domain where the traefik dashboard will be available
 email: "security@yourdomain.com" # This is the email address for the letsencrypt certificate
