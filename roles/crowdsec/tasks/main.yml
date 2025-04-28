@@ -73,7 +73,13 @@
         - /var/log/traefik/access.log
       labels:
         type: traefik
-    mode: '0644'
+      ---
+      source: journalctl
+      journalctl_filter:
+       - "_SYSTEMD_UNIT=ssh.service"
+      labels:
+        type: syslog
+          mode: '0644'
 
 - name: Schedule CrowdSec restart
   ansible.builtin.cron:
