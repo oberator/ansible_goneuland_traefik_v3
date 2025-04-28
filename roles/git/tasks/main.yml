@@ -13,35 +13,34 @@
     version: main
     force: yes
 
-- name: Copy .env.sample to .env
+- name: Copy sample files to their destinations
   copy:
-    src: "{{ repo_dest }}/.env.sample"
-    dest: "{{ repo_dest }}/.env"
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
     remote_src: yes
+  with_items:
+    - { src: "{{ repo_dest }}/.env.sample", dest: "{{ repo_dest }}/.env" }
+    - { src: "{{ repo_dest }}/data/traefik/.env.sample", dest: "{{ repo_dest }}/data/traefik/.env" }
+    - { src: "{{ repo_dest }}/data/traefik-crowdsec-bouncer/.env.sample", dest: "{{ repo_dest }}/data/traefik-crowdsec-bouncer/.env" }
+    - { src: "{{ repo_dest }}/data/socket-proxy/.env.sample", dest: "{{ repo_dest }}/data/socket-proxy/.env" }
+    - { src: "{{ repo_dest }}/data/crowdsec/.env.sample", dest: "{{ repo_dest }}/data/crowdsec/.env" }
+    - { src: "{{ repo_dest }}/data/traefik/traefik.yml.sample", dest: "{{ repo_dest }}/data/traefik/traefik.yml" }
+    - { src: "{{ repo_dest }}/data/traefik/certs/acme_letsencrypt.json.sample", dest: "{{ repo_dest }}/data/traefik/certs/acme_letsencrypt.json" }
+    - { src: "{{ repo_dest }}/data/traefik/certs/tls_letsencrypt.json.sample", dest: "{{ repo_dest }}/data/traefik/certs/tls_letsencrypt.json" }
+    - { src: "{{ repo_dest }}/data/traefik/dynamic_conf/http.middlewares.default.yml.sample", dest: "{{ repo_dest }}/data/traefik/dynamic_conf/http.middlewares.default.yml" }
+    - { src: "{{ repo_dest }}/data/traefik/dynamic_conf/http.middlewares.default-security-headers.yml.sample", dest: "{{ repo_dest }}/data/traefik/dynamic_conf/http.middlewares.default-security-headers.yml" }
+    - { src: "{{ repo_dest }}/data/traefik/dynamic_conf/http.middlewares.gzip.yml.sample", dest: "{{ repo_dest }}/data/traefik/dynamic_conf/http.middlewares.gzip.yml" }
+    - { src: "{{ repo_dest }}/data/traefik/dynamic_conf/http.middlewares.traefik-bouncer.yml.sample", dest: "{{ repo_dest }}/data/traefik/dynamic_conf/http.middlewares.traefik-bouncer.yml" }
+    - { src: "{{ repo_dest }}/data/traefik/dynamic_conf/http.middlewares.traefik-dashboard-auth.yml.sample", dest: "{{ repo_dest }}/data/traefik/dynamic_conf/http.middlewares.traefik-dashboard-auth.yml" }
+    - { src: "{{ repo_dest }}/data/traefik/dynamic_conf/tls.yml.sample", dest: "{{ repo_dest }}/data/traefik/dynamic_conf/tls.yml" }
 
-- name: Copy traefik.env.sample to .env
-  copy:
-    src: "{{ repo_dest }}/data/traefik/.env.sample"
-    dest: "{{ repo_dest }}/data/traefik/.env"
-    remote_src: yes
-
-- name: Copy traefik-crowdsec-bouncer.env.sample to .env
-  copy:
-    src: "{{ repo_dest }}/data/traefik-crowdsec-bouncer/.env.sample"
-    dest: "{{ repo_dest }}/data/traefik-crowdsec-bouncer/.env"
-    remote_src: yes
-
-- name: Copy socket-proxy.env.sample to .env
-  copy:
-    src: "{{ repo_dest }}/data/socket-proxy/.env.sample"
-    dest: "{{ repo_dest }}/data/socket-proxy/.env"
-    remote_src: yes
-
-- name: Copy crowdsec.env.sample to .env
-  copy:
-    src: "{{ repo_dest }}/data/crowdsec/.env.sample"
-    dest: "{{ repo_dest }}/data/crowdsec/.env"
-    remote_src: yes
+- name: Set permissions for sensitive files
+  file:
+    path: "{{ item }}"
+    mode: "{{ file_permission_mode | default('0600') }}"
+  with_items:
+    - "{{ repo_dest }}/data/traefik/certs/acme_letsencrypt.json"
+    - "{{ repo_dest }}/data/traefik/certs/tls_letsencrypt.json"
 
 - name: Replace Variables in .env
   lineinfile:
