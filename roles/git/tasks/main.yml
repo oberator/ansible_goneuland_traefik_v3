@@ -53,3 +53,10 @@
     path: "{{ repo_dest }}/.env"
     regexp: "^SERVICES_TRAEFIK_LABELS_TRAEFIK_HOST=.*"
     line: "SERVICES_TRAEFIK_LABELS_TRAEFIK_HOST=HOST(`{{ traeffikdashboarddomain }}`)"
+
+- name: Set correct permissions for .env file
+  file:
+    path: "{{ item }}"
+    mode: '0644'
+  loop:
+    - "{{ repo_dest }}/.env"
