@@ -89,16 +89,16 @@ The cleanup role performs final cleanup tasks, such as removing unnecessary pack
 
 ## Variables
 
-The `group_vars/all.yml` file defines global variables used across roles. Descriptions of each variable are available in the comments within the file.
+The `group_vars/all.yml` file defines global variables used across roles. Descriptions of each variable are available in the comments within the file. 
 
 ## Usage
 
 To use this Ansible playbook, follow these steps:
 
 1. **Clone the Repository**: Clone this repository to your local machine where Ansible is installed.
-2. **Configure Inventory**: Edit the `hosts.ini` file to include the details of the servers you want to manage.
+2. **Configure Inventory**: Copy the `hosts.ini.sample` file to `hosts.ini` and edit it to include the details of the servers you want to manage.
 3. **DNS Configuration**: Ensure that the DNS A-Record for your domain is correctly set up.
-4. **Set Variables**: Update the `group_vars/all.yml` file with your desired configuration settings.
+4. **Set Variables**: Copy the `group_vars/all.yml.sample` file to `group_vars/all.yml` and update it with your desired configuration settings.
 5. **Run the Playbook**: Execute the playbook from your local machine (not on the remote server) using the following command:
 
     ```sh
