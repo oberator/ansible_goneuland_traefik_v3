@@ -5,8 +5,9 @@
 This repository contains an Ansible playbook for automated server provisioning, inspired by [@Psycho0verload](https://github.com/Psycho0verload/traefik-crowdsec-stack) and [Goneuland](https://goneuland.de/traefik-v3-installation-konfiguration-und-crowdsec-security/8/). It includes roles for setting up common server configurations, Docker, SSH, firewall, Git, and CrowdSec.
 
 **Note:** This repository is intended to work with Debian 11 & 12 distributions. Using other distributions may result in errors due to the Debian-oriented apt repository.
+
 ![Debian 11 - Testing](https://img.shields.io/badge/Debian_11_(Bullseye)-10--02--2025-A81D33?logo=debian&logoColor=white)
-![Debian 12 - Testing](https://img.shields.io/badge/Debian_12_(Bookworm)-10--02--2025-A81D33?logo=debian&logoColor=white)
+![Debian 12 - Testing](https://img.shields.io/badge/Debian_12_(Bookworm)-12--05--2025-A81D33?logo=debian&logoColor=white)
 
 ## Directory Structure
 
