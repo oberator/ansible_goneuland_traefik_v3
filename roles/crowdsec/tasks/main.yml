@@ -111,7 +111,4 @@
     group: root
     mode: '0644'
 
-- name: Start all Containers
-  community.docker.docker_compose_v2:
-    project_src: "{{ repo_dest }}"
-    state: present
+
