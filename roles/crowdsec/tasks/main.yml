@@ -34,7 +34,7 @@
   register: bouncer_key
   changed_when: false
 
-- name: Display generated Bouncer key
+- name: Display generated Bouncer key for Traefik
   debug:
     msg: "Generated BOUNCER_KEY: {{ bouncer_key.stdout }}"
 
