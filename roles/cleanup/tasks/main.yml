@@ -1,4 +1,24 @@
 ---
+- name: Setup logrotate for Traefik
+  copy:
+    dest: /etc/logrotate.d/traefik
+    content: |
+      /var/log/traefik/access.log {
+          daily
+          missingok
+          rotate 5 
+          compress
+          delaycompress
+          notifempty
+          create 0644 root root
+          postrotate
+             docker restart $(docker ps --no-trunc --filter name=^/traefik$ --quiet)
+          endscript
+      }
+    owner: root
+    group: root
+    mode: '0644'
+
 - name: Restart SSH
   service:
     name: ssh
