@@ -1,3 +1,5 @@
+[![de](https://img.shields.io/badge/lang-de-yellow.svg)](https://github.com/oberator/ansible_goneuland_traefik_v3/blob/main/readme.de.md)
+
 # Automated Server Provisioning with Ansible
 
 This repository contains an Ansible playbook for automated server provisioning, inspired by [@Psycho0verload](https://github.com/Psycho0verload/traefik-crowdsec-stack) and [Goneuland](https://goneuland.de/traefik-v3-installation-konfiguration-und-crowdsec-security/8/). It includes roles for setting up common server configurations, Docker, SSH, firewall, Git, and CrowdSec.
