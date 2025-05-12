@@ -2,17 +2,27 @@
 - name: Add CrowdSec repository
   shell: curl -s https://install.crowdsec.net | sudo sh
   args:
-    creates: /etc/apt/sources.list.d/crowdsec.list
+   creates: /etc/apt/sources.list.d/crowdsec.list
   become: true
 
-- name: Install CrowdSec Firewall Bouncer for UFW + IPTables
+- name: Check iptables version for identifying backend
+  shell: iptables -V
+  register: iptables_version
+  changed_when: false
+  failed_when: false
+
+- name: Set firewall backend (nftables vs. iptables) based on iptables version
+  set_fact:
+     firewall_backend: "{{ 'nftables' if 'nf_tables' in iptables_version.stdout.lower() else 'iptables' }}"
+
+- name: Install CrowdSec Firewall Bouncer based on firewall backend
   apt:
-    name: crowdsec-firewall-bouncer-iptables
+    name: "crowdsec-firewall-bouncer-{{ firewall_backend }}"
     state: present
   when: ansible_facts['os_family'] == "Debian"
   become: true
 
-- name: Generate secure Bouncer key
+- name: Generate secure Firewall-Bouncer key
   shell: openssl rand -base64 48 | tr -dc 'a-zA-Z0-9!@#$%^&*()-_=+[]{}<>?|'
   register: bouncer_firewall_key
   changed_when: false
@@ -21,11 +31,24 @@
   debug:
     msg: "Generated BOUNCER_KEY_FIREWALL: {{ bouncer_firewall_key.stdout }}"
 
+
 - name: Store Bouncer key in .env file
   lineinfile:
     path: "{{ repo_dest }}/.env"
     line: 'BOUNCER_KEY_FIREWALL="{{ bouncer_firewall_key.stdout }}"'
     create: yes
+  become: true  
+
+- name: Configure CrowdSec Firewall Bouncer
+  lineinfile:
+    path: /etc/crowdsec/bouncers/crowdsec-firewall-bouncer.yaml
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  loop:
+    - regexp: '^api_url:'
+      line: 'api_url: http://172.31.127.254:8080/'
+    - regexp: '^api_key:'
+      line: 'api_key: {{ bouncer_firewall_key.stdout }}'
   become: true
 
 - name: Enable CrowdSec Firewall Bouncer service
@@ -44,6 +67,11 @@
 - name: Show service status
   debug:
     msg: "{{ bouncer_status.stdout_lines }}"
+
+- name: Start all Containers
+  community.docker.docker_compose_v2:
+    project_src: "{{ repo_dest }}"
+    state: present
 
 - name: List registered CrowdSec bouncers
   command: docker exec crowdsec cscli bouncers list
