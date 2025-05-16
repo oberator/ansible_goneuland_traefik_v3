@@ -73,13 +73,21 @@
 - name: Show service status
   debug:
     msg: "{{ bouncer_status.stdout_lines }}"
+    
+- name: Delete CrowdSec data directory contents
+  # This is necessary to remove old data and avoid conflicts
+  file:
+    path: "{{ repo_dest }}/data/crowdsec/data/*"
+    state: absent
+  become: true
 
 - name: Start all Containers
   community.docker.docker_compose_v2:
     project_src: "{{ repo_dest }}"
     state: present
 
-- name: Remove Firewall bouncer to CrowdSec (only neccessary on updating this script)
+- name: Remove Firewall bouncer to CrowdSec
+  # This is necessary to remove old data and avoid conflicts
   command: docker exec crowdsec cscli bouncers remove FIREWALL
   changed_when: false
   become: true
