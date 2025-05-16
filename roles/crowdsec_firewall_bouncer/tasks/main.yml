@@ -30,19 +30,20 @@
 - name: Generate secure Firewall-Bouncer key
   shell: openssl rand -base64 48 | tr -dc 'a-zA-Z0-9!@#$%^&*()-_=+[]{}<>?|'
   register: bouncer_firewall_key
-  changed_when: false
+  no_log: true
 
-- name: Display generated Bouncer key
-  debug:
-    msg: "Generated BOUNCER_KEY_FIREWALL: {{ bouncer_firewall_key.stdout }}"
-
+# Only for debugging purposes
+#- name: Display generated Bouncer key
+#  debug:
+#    msg: "Generated BOUNCER_KEY_FIREWALL: {{ bouncer_firewall_key.stdout }}"
 
 - name: Store Bouncer key in .env file
   lineinfile:
     path: "{{ repo_dest }}/.env"
     line: 'BOUNCER_KEY_FIREWALL="{{ bouncer_firewall_key.stdout }}"'
     create: yes
-  become: true  
+  become: true
+  no_log: true
 
 - name: Configure CrowdSec Firewall Bouncer
   lineinfile:
@@ -77,6 +78,20 @@
   community.docker.docker_compose_v2:
     project_src: "{{ repo_dest }}"
     state: present
+
+- name: Remove Firewall bouncer to CrowdSec (only neccessary on updating this script)
+  command: docker exec crowdsec cscli bouncers remove FIREWALL
+  changed_when: false
+  become: true
+
+- name: Add Firewall bouncer to CrowdSec (only neccessary on updating this script)
+  command: docker exec crowdsec cscli bouncers add FIREWALL -k "{{ bouncer_firewall_key.stdout }}"
+  changed_when: false
+  become: true
+
+- name: Pause for 5 seconds...
+  wait_for:
+    timeout: 5
 
 - name: List registered CrowdSec bouncers
   command: docker exec crowdsec cscli bouncers list
