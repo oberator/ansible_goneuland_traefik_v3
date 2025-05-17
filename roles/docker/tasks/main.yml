@@ -59,3 +59,11 @@
       - docker-buildx-plugin
       - docker-compose-plugin
     state: present
+
+- name: Create Docker directory
+  file:
+    path: "{{ docker_directory }}"
+    state: directory
+    owner: "{{ admin_user }}"
+    group: docker
+    mode: '0750'
