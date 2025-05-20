@@ -4,7 +4,6 @@
     path: /etc/ssh/sshd_config
     regexp: "^#?Port "
     line: "Port {{ ssh_port }}"
-#  notify: Restart SSH
 
 - name: Set up SSH Key Authentication
   authorized_key:
@@ -18,3 +17,33 @@
     state: present
     regexp: '^#?PermitRootLogin'
     line: 'PermitRootLogin prohibit-password'
+
+- name: Disable password authentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PasswordAuthentication'
+    line: 'PasswordAuthentication no'
+
+- name: Disable challenge-response authentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?ChallengeResponseAuthentication'
+    line: 'ChallengeResponseAuthentication no'
+
+- name: Disable X11 forwarding
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?X11Forwarding'
+    line: 'X11Forwarding no'
+
+- name: Set SSH protocol to 2 only
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?Protocol'
+    line: 'Protocol 2'
+
+- name: Limit SSH access to specific users
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?AllowUsers'
+    line: 'AllowUsers {{ admin_user }}'
