@@ -1,0 +1,31 @@
+set daemon {{ monit_check_interval }}
+set logfile syslog
+set statefile /var/lib/monit/state
+set idfile /var/lib/monit/id
+
+# Mail server configuration
+set mailserver {{ mailserver }} port 587
+    username "{{ mail_user }}" password "{{ mail_pass }}"
+    using ssl
+    with timeout {{ monit_mail_timeout }} seconds
+    using hostname {{ mailserver }}
+
+# Mail format configuration
+set mail-format {
+    from: {{ mail_user }}
+    subject: [Monit] $EVENT - $SERVICE on {{ inventory_hostname }}
+    message: Monit notification from {{ inventory_hostname }}
+    
+    Date:        $DATE
+    Service:     $SERVICE
+    Event:       $EVENT
+    Action:      $ACTION
+    Description: $DESCRIPTION
+}
+
+# Alert settings
+set alert {{ alert_email }} with reminder on {{ monit_alert_reminder_cycles }} cycles
+set httpd unixsocket /var/run/monit.sock
+
+# Include all configuration files
+include /etc/monit/conf.d/*

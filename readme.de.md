@@ -38,6 +38,20 @@ roles/
     git/
         tasks/
             main.yml
+    monit/
+        defaults/
+            main.yml
+        handlers/
+            main.yml
+        meta/
+            main.yml
+        tasks/
+            main.yml
+        templates/
+            monit-gotify.sh.j2
+            monitrc.j2
+            override.conf.j2
+            system.conf.j2
     ssh/
         tasks/
             main.yml
@@ -85,6 +99,22 @@ Die Rolle "crowdsec" richtet CrowdSec für die Erkennung und Verhinderung von Ei
 ### CrowdSec Firewall Bouncer
 
 Die Rolle "crowdsec_firewall_bouncer" installiert und konfiguriert den CrowdSec-Firewall-Bouncer zur Zusammenarbeit mit UFW.
+
+### Monit
+
+Die Rolle "monit" installiert und konfiguriert das Monit-System-Monitoring-Tool. Sie umfasst:
+- Systemressourcen-Überwachung (CPU, Speicher, Auslastung)
+- Dateisystem-Speicherplatz-Überwachung
+- E-Mail-Benachrichtigungen
+- Integration mit Gotify für Push-Benachrichtigungen
+- Anpassbare Alarmschwellen und Prüfintervalle
+
+Überwachte Metriken beinhalten:
+- CPU-Auslastung (Alarm bei 95% für 10 Zyklen)
+- Speichernutzung (Alarm bei 90% für 5 Zyklen)
+- Systemlast (Alarm bei Last > 3 für 8 Zyklen)
+- Festplattenplatz (Alarm bei 80% Nutzung)
+- Swap-Nutzung (Alarm bei 80% für 5 Zyklen)
 
 ### Cleanup
 

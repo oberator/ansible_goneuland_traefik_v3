@@ -10,3 +10,11 @@ traeffikdashboarddomain: "youdomain.com" #This is the domain where the traefik d
 email: "security@yourdomain.com" # This is the email address for the letsencrypt certificate
 dashboard_user: "mydashboarduser" # This is the user for the traefik dashboard
 dashboard_password: "verysecurepassword" # This is the password for the traefik dashboard
+
+# Monit Configuration
+mailserver: "smtp.example.com" # SMTP server for Monit alerts
+mail_user: "your_senders_mail@yourdomain.com" # Using the same email as for Let's Encrypt
+mail_pass: "your_mail_password" # Password for the SMTP server
+alert_email: "your_receivers_mail@yourdomain.com" # Using the same email for alerts
+gotify_url: "https://gotify.yourdomain.com" # Gotify server URL using your domain
+gotify_token: "your_gotify_token" # Your Gotify application token

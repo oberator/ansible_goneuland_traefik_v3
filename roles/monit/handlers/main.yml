@@ -1,0 +1,12 @@
+---
+- name: Reload monit
+  systemd:
+    name: monit
+    state: reloaded
+  become: true
+
+- name: Restart monit
+  systemd:
+    name: monit
+    state: restarted
+  become: true

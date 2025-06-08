@@ -1,0 +1,37 @@
+#!/bin/bash
+set -e
+
+# Configuration
+GOTIFY_URL="{{ gotify_url }}"
+GOTIFY_TOKEN="{{ gotify_token }}"
+
+# Check if required parameters are provided
+if [ $# -lt 2 ]; then
+    echo "Usage: $0 <title> <message> [priority]"
+    exit 1
+fi
+
+TITLE="$1"
+MESSAGE="$2"
+PRIORITY="$3"
+if [ -z "$PRIORITY" ]; then
+    PRIORITY="5"
+fi
+
+# Validate URL
+if [[ ! "$GOTIFY_URL" =~ ^https?:// ]]; then
+    echo "Invalid Gotify URL format"
+    exit 1
+fi
+
+# Send notification and get HTTP code separately
+HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$GOTIFY_URL/message?token=$GOTIFY_TOKEN" \
+    -F "title=$TITLE" \
+    -F "message=$MESSAGE" \
+    -F "priority=$PRIORITY")
+
+# Check HTTP response code
+if [ "$HTTP_CODE" != "200" ]; then
+    echo "Failed to send notification. HTTP code: $HTTP_CODE"
+    exit 1
+fi

@@ -1,0 +1,20 @@
+---
+galaxy_info:
+  author: oberator
+  description: Monit installation and configuration with Gotify notifications
+  license: MIT
+  min_ansible_version: 2.9
+  platforms:
+    - name: Debian
+      versions:
+        - all
+    - name: Ubuntu
+      versions:
+        - all
+  
+  galaxy_tags:
+    - monitoring
+    - system
+    - alerts
+
+dependencies: []

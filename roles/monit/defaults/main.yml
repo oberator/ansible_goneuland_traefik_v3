@@ -1,0 +1,37 @@
+---
+# Monit check intervals and thresholds
+# Monit check interval in seconds
+monit_check_interval: 60
+
+# CPU usage threshold percentage and cycles before alert
+monit_cpu_threshold: 95
+monit_cpu_cycles: 10
+
+# Memory usage threshold percentage and cycles before alert
+monit_memory_threshold: 90
+monit_memory_cycles: 5
+
+# Load average threshold and cycles before alert
+monit_loadavg_threshold: 3
+monit_loadavg_cycles: 8
+
+# Swap usage threshold percentage and cycles before alert
+monit_swap_threshold: 80
+monit_swap_cycles: 5
+
+# Disk usage threshold percentage and cycles before alert
+monit_disk_threshold: 80
+monit_disk_cycles: 5
+
+# Inode usage threshold percentage and cycles before alert
+monit_inode_threshold: 85
+monit_inode_cycles: 5
+
+# Mail alert reminder cycles and timeout in seconds
+monit_alert_reminder_cycles: 30
+monit_mail_timeout: 30
+
+# Paths
+monit_conf_dir: /etc/monit/conf.d
+monit_config_file: /etc/monit/monitrc
+monit_gotify_script: /usr/local/bin/monit-gotify.sh

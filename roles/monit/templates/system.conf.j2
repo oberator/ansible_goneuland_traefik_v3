@@ -1,0 +1,24 @@
+# System Resources Monitoring
+check system {{ inventory_hostname }}
+    # CPU usage averaged over 1, 5, and 15 minutes
+    if cpu usage > {{ monit_cpu_threshold }}% for {{ monit_cpu_cycles }} cycles then exec "{{ monit_gotify_script }} 'CPU Alert' 'CPU usage is over {{ monit_cpu_threshold }}%' 8" as uid root and gid root
+    if cpu usage > {{ monit_cpu_threshold }}% for {{ monit_cpu_cycles }} cycles then alert
+
+    # Memory usage
+    if memory usage > {{ monit_memory_threshold }}% for {{ monit_memory_cycles }} cycles then exec "{{ monit_gotify_script }} 'Memory Alert' 'Memory usage is over {{ monit_memory_threshold }}%' 8" as uid root and gid root
+    if memory usage > {{ monit_memory_threshold }}% for {{ monit_memory_cycles }} cycles then alert
+
+    # Swap usage
+    if swap usage > {{ monit_swap_threshold }}% for {{ monit_swap_cycles }} cycles then exec "{{ monit_gotify_script }} 'Swap Alert' 'Swap usage is over {{ monit_swap_threshold }}%' 8" as uid root and gid root
+    if swap usage > {{ monit_swap_threshold }}% for {{ monit_swap_cycles }} cycles then alert
+
+    # System load (5 minute average)
+    if loadavg (5min) > {{ monit_loadavg_threshold }} for {{ monit_loadavg_cycles }} cycles then exec "{{ monit_gotify_script }} 'System Load Alert' 'System load is very high' 8" as uid root and gid root
+    if loadavg (5min) > {{ monit_loadavg_threshold }} for {{ monit_loadavg_cycles }} cycles then alert
+
+# Root Filesystem Monitoring
+check filesystem rootfs with path /
+    if space usage > {{ monit_disk_threshold }}% for {{ monit_disk_cycles }} cycles then exec "{{ monit_gotify_script }} 'Disk Space Alert' 'Disk usage on / is over {{ monit_disk_threshold }}%' 8" as uid root and gid root
+    if space usage > {{ monit_disk_threshold }}% for {{ monit_disk_cycles }} cycles then alert
+    if inode usage > {{ monit_inode_threshold }}% for {{ monit_inode_cycles }} cycles then exec "{{ monit_gotify_script }} 'Inode Alert' 'Inode usage on / is over {{ monit_inode_threshold }}%' 8" as uid root and gid root
+    if inode usage > {{ monit_inode_threshold }}% for {{ monit_inode_cycles }} cycles then alert

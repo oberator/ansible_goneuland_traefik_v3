@@ -1,0 +1,93 @@
+---
+- name: Install monit
+  apt:
+    name: monit
+    state: present
+    update_cache: yes
+  become: true
+
+- name: Upload monit config
+  template:
+    src: monitrc.j2
+    dest: /etc/monit/monitrc
+    mode: '0700'
+  become: true
+  notify: Restart monit
+
+- name: Upload Gotify script
+  template:
+    src: monit-gotify.sh.j2
+    dest: /usr/local/bin/monit-gotify.sh
+    mode: '0755'
+  become: true
+
+- name: Ensure monit service is enabled
+  systemd:
+    name: monit
+    enabled: yes
+    state: started
+  become: true
+
+- name: Create monit conf.d directory
+  file:
+    path: /etc/monit/conf.d
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Upload system monitoring config
+  template:
+    src: system.conf.j2
+    dest: /etc/monit/conf.d/system.conf
+    mode: '0644'
+  become: true
+  notify: Reload monit
+
+- name: Verify monit configuration
+  command: monit -t
+  changed_when: false
+  register: monit_verify
+  become: true
+  notify: Reload monit
+  failed_when: monit_verify.rc != 0
+
+- name: Create systemd override directory
+  file:
+    path: /etc/systemd/system/monit.service.d
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Configure systemd override
+  template:
+    src: override.conf.j2
+    dest: /etc/systemd/system/monit.service.d/override.conf
+    mode: '0644'
+  become: true
+  notify: Restart monit
+
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: yes
+  become: true
+  when: ansible_service_mgr == 'systemd'
+
+- name: Send test message to Gotify
+  command: /usr/local/bin/monit-gotify.sh "Monit Setup" "Monit monitoring has been successfully configured on {{ inventory_hostname }}" 5
+  become: true
+  changed_when: false
+  register: gotify_test
+  failed_when: gotify_test.rc != 0
+
+- name: Ensure Monit directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0700'
+    owner: root
+    group: root
+  loop:
+    - /var/lib/monit
+    - /var/run/monit
+  become: true
+  notify: Restart monit
