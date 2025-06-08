@@ -12,3 +12,4 @@
     - role: crowdsec
     - role: crowdsec_firewall_bouncer
     - role: cleanup
+    - role: monit
