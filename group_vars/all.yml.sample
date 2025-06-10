@@ -13,8 +13,8 @@ dashboard_password: "verysecurepassword" # This is the password for the traefik 
 
 # Monit Configuration
 mailserver: "smtp.example.com" # SMTP server for Monit alerts
-mail_user: "your_senders_mail@yourdomain.com" # Using the same email as for Let's Encrypt
+mail_user: "your_senders_mail@yourdomain.com" # Add you Mailuser
 mail_pass: "your_mail_password" # Password for the SMTP server
-alert_email: "your_receivers_mail@yourdomain.com" # Using the same email for alerts
+alert_email: "your_receivers_mail@yourdomain.com" # Add your Alert/Receivers Email
 gotify_url: "https://gotify.yourdomain.com" # Gotify server URL using your domain
 gotify_token: "your_gotify_token" # Your Gotify application token
