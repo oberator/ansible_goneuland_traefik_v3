@@ -16,12 +16,13 @@
     - "{{ repo_dest }}/data/traefik/certs/acme_letsencrypt.json"
     - "{{ repo_dest }}/data/traefik/certs/tls_letsencrypt.json"
     
-- name: Copy Traefik sample configuration to active configuration
+- name: Copy Traefik sample configuration to active configuration if it doesn't exist
   ansible.builtin.copy:
     src: "{{ repo_dest }}/data/traefik/traefik.yml.sample"
     dest: "{{ repo_dest }}/data/traefik/traefik.yml"
     remote_src: yes
     mode: '0644'
+    force: no
 
 - name: Update all email addresses in Traefik configuration
   replace:
