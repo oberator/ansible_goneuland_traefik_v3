@@ -13,11 +13,12 @@
     version: main
     force: yes
 
-- name: Copy sample files to their destinations
+- name: Copy sample files to their destinations if they do not exist
   copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     remote_src: yes
+    force: no
   with_items:
     - { src: "{{ repo_dest }}/.env.sample", dest: "{{ repo_dest }}/.env" }
     - { src: "{{ repo_dest }}/data/traefik/.env.sample", dest: "{{ repo_dest }}/data/traefik/.env" }
